@@ -9,74 +9,135 @@ app.use(cors());
 app.use(express.json());
 
 // DATABASE CONNECTION
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
-});
+const db = mysql.createConnection(process.env.MYSQL_PUBLIC_URL);
+
 
 db.connect((err) => {
+
     if (err) {
         console.log("❌ Database Error");
         console.log(err);
-    } else {
+    } 
+    else {
         console.log("✅ MySQL Connected");
     }
+
 });
 
-// TEST ROUTE
+// HOME ROUTE
 app.get("/", (req, res) => {
     res.send("Backend Running");
 });
 
 // GET STUDENTS
 app.get("/students", (req, res) => {
+
     const sql = "SELECT * FROM students";
 
     db.query(sql, (err, result) => {
+
         if (err) {
-            res.json({ success: false });
-        } else {
+
+            res.json({
+                success: false,
+                error: err
+            });
+
+        } 
+        else {
+
             res.json(result);
+
         }
+
     });
+
 });
 
 // ADD STUDENT
 app.post("/add-student", (req, res) => {
-    const { name, email } = req.body;
+
+    const name = req.body.name;
+    const email = req.body.email;
 
     const sql = "INSERT INTO students (name, email) VALUES (?, ?)";
 
     db.query(sql, [name, email], (err, result) => {
+
         if (err) {
-            res.json({ success: false });
-        } else {
-            res.json({ success: true });
+
+            res.json({
+                success: false
+            });
+
+        } 
+        else {
+
+            res.json({
+                success: true
+            });
+
         }
+
     });
+
 });
 
 // LOGIN
 app.post("/login", (req, res) => {
-    const { email, password } = req.body;
+
+    const email = req.body.email;
+    const password = req.body.password;
 
     const sql = "SELECT * FROM users WHERE email=? AND password=?";
 
     db.query(sql, [email, password], (err, result) => {
-        if (err) {
-            res.json({ success: false });
-        } else {
-            if (result.length > 0) {
-                res.json({ success: true });
-            } else {
-                res.json({ success: false });
-            }
-        }
-    });
-});
 
+        if (err) {
+
+            res.json({
+                success: false
+            });
+
+        } 
+        else {
+
+            if (result.length > 0) {
+
+                res.json({
+                    success: true
+                });
+
+            } 
+            else {
+
+                res.json({
+                    success: false
+                });
+
+            }
+
+        }
+
+    });
+
+});
+app.get("/test-login", (req, res) => {
+
+    const sql = "SELECT * FROM users";
+
+    db.query(sql, (err, result) => {
+
+        if (err) {
+            res.json(err);
+        } 
+        else {
+            res.json(result);
+        }
+
+    });
+
+});
 // SERVER START
 const PORT = process.env.PORT || 3000;
 
