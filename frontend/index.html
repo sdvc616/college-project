@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Project</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            background:#f5f5f5;
+            padding:40px;
+        }
+
+        h1{
+            color:darkblue;
+        }
+
+        input{
+            width:300px;
+            padding:12px;
+            margin-top:10px;
+            display:block;
+        }
+
+        button{
+            margin-top:15px;
+            padding:12px 20px;
+            background:darkblue;
+            color:white;
+            border:none;
+            cursor:pointer;
+        }
+
+        .student{
+            background:white;
+            padding:15px;
+            margin-top:10px;
+            border-radius:10px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <h1>Add Student</h1>
+
+    <input type="text" id="name" placeholder="Enter Name">
+
+    <input type="email" id="email" placeholder="Enter Email">
+
+    <button onclick="addStudent()">
+        Add Student
+    </button>
+
+    <h1>Students List</h1>
+
+    <div id="students"></div>
+
+<script>
+
+loadStudents();
+
+function loadStudents(){
+
+    fetch("http://localhost:3000/students")
+    .then(res => res.json())
+    .then(data => {
+
+        let output = "";
+
+        data.forEach(student => {
+
+            output += `
+                <div class="student">
+                    <h3>${student.name}</h3>
+                    <p>${student.email}</p>
+                </div>
+            `;
+
+        });
+
+        document.getElementById("students").innerHTML = output;
+
+    });
+
+}
+
+function addStudent(){
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+
+    fetch("http://localhost:3000/add-student", {
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({
+            name:name,
+            email:email
+        })
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        alert("Student Added");
+
+        loadStudents();
+
+        document.getElementById("name").value = "";
+        document.getElementById("email").value = "";
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
